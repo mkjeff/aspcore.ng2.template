@@ -1,0 +1,7 @@
+{
+  "name": "CIM.EAP.Host",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "3.3.5"
+  }
+}
