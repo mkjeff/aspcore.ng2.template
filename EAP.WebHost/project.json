@@ -1,0 +1,55 @@
+﻿{
+  "userSecretsId": "aspnet5-EAP.WebHost-6e4f2598-023c-4b24-97cc-c403110fb12b",
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "AspNet.Security.OAuth.Introspection": "1.0.0-*",
+    "AspNet.Security.OAuth.Validation": "1.0.0-*",
+
+    "EntityFramework.MicrosoftSqlServer": "7.0.0-*",
+    "EntityFramework.Commands": "7.0.0-*",
+
+    "Microsoft.AspNet.Authentication.Google": "1.0.0-*",
+    "Microsoft.AspNet.Authentication.Twitter": "1.0.0-*",
+    "Microsoft.AspNet.Diagnostics": "1.0.0-*",
+    "Microsoft.AspNet.IISPlatformHandler": "1.0.0-*",
+    "Microsoft.AspNet.HttpOverrides": "1.0.0-*",
+    "Microsoft.AspNet.Mvc.TagHelpers": "6.0.0-*",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNet.StaticFiles": "1.0.0-*",
+
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0-*",
+
+    "OpenIddict": "1.0.0-*",
+    "Swashbuckle.SwaggerGen": "6.0.0-*",
+    "Swashbuckle.SwaggerUi": "6.0.0-*"
+  },
+
+  "commands": {
+    "web": "EAP.WebHost",
+    "ef": "EntityFramework.Commands",
+    "devo": "EAP.WebHost --server Microsoft.AspNet.Server.Kestrel --server.urls http://0.0.0.0:5001 --ASPNET_ENV Development",
+    "staging": "EAP.WebHost --server Microsoft.AspNet.Server.Kestrel --server.urls http://0.0.0.0:5002 --ASPNET_ENV Staging",
+    "prod": "EAP.WebHost --server Microsoft.AspNet.Server.Kestrel --server.urls http://0.0.0.0:5003 --ASPNET_ENV Production"
+  },
+
+  "frameworks": {
+    "dnx451": { },
+    "dnxcore50": { }
+  },
+
+  "exclude": [
+    "wwwroot",
+    "node_modules"
+  ],
+  "publishExclude": [
+    "**.user",
+    "**.vspscc"
+  ],
+  "scripts": {
+    "prepublish": [ "npm install", "bower install", "gulp clean", "gulp min" ]
+  }
+}

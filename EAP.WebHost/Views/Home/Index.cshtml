@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<cache vary-by="@Context.Request.Path">
+    <app>
+        Loading...
+    </app>
+</cache>
+
+@section scripts {
+    <script>
+        System.config({
+            packages: {'app': { format:'cjs', defaultExtension: 'js'}}
+        });
+        System.import('app/home/main').catch(console.log.bind(console));
+    </script>
+}
