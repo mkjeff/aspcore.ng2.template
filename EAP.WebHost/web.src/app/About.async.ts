@@ -1,13 +1,10 @@
-﻿import {Component,View} from 'angular2/core';
+﻿import {Component} from 'angular2/core';
 import {Title} from 'angular2/platform/browser';
 
 @Component({
     selector: 'about',
-    moduleId: module.id,
+    template: require('./About.html'),
     viewProviders: [Title],
-})
-    @View({
-        templateUrl: 'About.html',
 })
 export class AboutComponent {
     constructor(title: Title) {

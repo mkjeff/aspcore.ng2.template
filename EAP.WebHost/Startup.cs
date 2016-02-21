@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EAP.WebHost.Models;
 using EAP.WebHost.Services;
-using CryptoHelper;
-using OpenIddict;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using OpenIddict.Models;
-using Microsoft.AspNet.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using OpenIddict;
 using NWebsec.Middleware;
-using Microsoft.AspNet.StaticFiles;
 
 namespace EAP.WebHost
 {
@@ -24,37 +20,24 @@ namespace EAP.WebHost
     {
         public static void Main(string[] args)
         {
-            try {
-                var application = new WebApplicationBuilder()
-                    .UseConfiguration(WebApplicationConfiguration.GetDefault(args))
-                    .UseStartup<Startup>()
-                    .Build();
+            try
+            {
+                var application = new WebHostBuilder()
+                   .UseCaptureStartupErrors(captureStartupError: true)
+                   .UseDefaultConfiguration(args)
+                   .UseIISPlatformHandlerUrl()
+                   .UseServer("Microsoft.AspNetCore.Server.Kestrel")
+                   .UseStartup<Startup>()
+                   .Build();
 
                 application.Run();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
         }
 
-        //public Startup(IHostingEnvironment env)
-        //{
-        //    // Set up configuration sources.
-        //    var builder = new ConfigurationBuilder()
-        //        .AddJsonFile("appsettings.json")
-        //        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-        //    if (env.IsDevelopment())
-        //    {
-        //        // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-        //        //builder.AddUserSecrets();
-        //    }
-
-        //    builder.AddEnvironmentVariables();
-        //    Configuration = builder.Build();
-        //}
-
-        //public IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -63,16 +46,6 @@ namespace EAP.WebHost
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
-            // Add framework services.
-            services.AddEntityFramework()
-                .AddSqlServer()
-                .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(configuration["Data:DefaultConnection:ConnectionString"]));
-
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders()
-                .AddOpenIddict();
 
             services.AddMvc();
 
@@ -99,27 +72,7 @@ namespace EAP.WebHost
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-
-                // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
-                try
-                {
-                    using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                        .CreateScope())
-                    {
-                        serviceScope.ServiceProvider.GetService<ApplicationDbContext>()
-                             .Database.Migrate();
-                    }
-                }
-                catch { }
             }
-
-            app.UseIISPlatformHandler(options => {
-                options.FlowWindowsAuthentication = false;
-            });
-
-            app.UseOverrideHeaders(options => {
-                options.ForwardedOptions = ForwardedHeaders.All;
-            });
 
             app.UseStaticFiles();
 
@@ -141,12 +94,14 @@ namespace EAP.WebHost
 
             // Note: OpenIddict must be added after
             // ASP.NET Identity and the external providers.
-            app.UseOpenIddict(options => {
+            app.UseOpenIddict(options =>
+            {
                 // You can customize the default Content Security Policy (CSP) by calling UseNWebsec explicitly.
                 // This can be useful to allow your HTML views to reference remote scripts/images/styles.
-                options.UseNWebsec(directives => {
-                    directives.ChildSources(directive=>directive.Self())
-                        .DefaultSources(directive => directive.Self())                        
+                options.UseNWebsec(directives =>
+                {
+                    directives.ChildSources(directive => directive.Self())
+                        .DefaultSources(directive => directive.Self())
                         .ImageSources(directive => directive.Self().CustomSources("*"))
                         .FontSources(directive => directive.Self().CustomSources("data:"))
                         .ScriptSources(directive => directive
@@ -191,13 +146,14 @@ namespace EAP.WebHost
                     //     Secret = "875sqd4s5d748z78z7ds1ff8zz8814ff88ed8ea4z4zzd"
                     // });
 
+                    var hasher = new PasswordHasher<Application>();
                     context.Applications.Add(new Application
                     {
                         Id = "myClient",
                         DisplayName = "My client application",
                         RedirectUri = "http://localhost:53507/signin-oidc",
                         LogoutRedirectUri = "http://localhost:53507/",
-                        Secret = Crypto.HashPassword("secret_secret_secret"),
+                        Secret = hasher.HashPassword(null, "secret_secret_secret"),
                         Type = OpenIddictConstants.ApplicationTypes.Confidential
                     });
 

@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Mvc;
-using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using EAP.WebHost.Models;
 using EAP.WebHost.Services;
 using EAP.WebHost.ViewModels.Account;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EAP.WebHost.Controllers
 {
@@ -23,6 +22,9 @@ namespace EAP.WebHost.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly ApplicationDbContext _applicationDbContext;
+        private static bool _databaseChecked;
+
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -90,8 +92,9 @@ namespace EAP.WebHost.Controllers
         // GET: /Account/Register
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Register()
+        public IActionResult Register(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
@@ -100,8 +103,11 @@ namespace EAP.WebHost.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
+            EnsureDatabaseCreated(_applicationDbContext);
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
@@ -143,6 +149,7 @@ namespace EAP.WebHost.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
+            EnsureDatabaseCreated(_applicationDbContext);
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -193,7 +200,7 @@ namespace EAP.WebHost.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginConfirmationViewModel model, string returnUrl = null)
         {
-            if (User.IsSignedIn())
+            if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction(nameof(ManageController.Index), "Manage");
             }
@@ -437,6 +444,20 @@ namespace EAP.WebHost.Controllers
 
         #region Helpers
 
+        // The following code creates the database and schema if they don't exist.
+        // This is a temporary workaround since deploying database through EF migrations is
+        // not yet supported in this release.
+        // Please see this http://go.microsoft.com/fwlink/?LinkID=615859 for more information on how to do deploy the database
+        // when publishing your application.
+        private static void EnsureDatabaseCreated(ApplicationDbContext context)
+        {
+            if (!_databaseChecked)
+            {
+                _databaseChecked = true;
+                context.Database.EnsureCreated();
+            }
+        }
+
         private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
@@ -447,7 +468,7 @@ namespace EAP.WebHost.Controllers
 
         private async Task<ApplicationUser> GetCurrentUserAsync()
         {
-            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return await _userManager.GetUserAsync(User);
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
