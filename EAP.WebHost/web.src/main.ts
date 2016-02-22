@@ -29,11 +29,33 @@ document.addEventListener('DOMContentLoaded', function main() {
         ...ENV_PROVIDERS,
         ...HTTP_PROVIDERS,
         ...ROUTER_PROVIDERS,
-        provide(LocationStrategy, { useClass: HashLocationStrategy })
     ])
         .catch(err => console.error(err));
 
 });
+
+/*
+ * Modified for using hot module reload
+ */
+
+// typescript lint error 'Cannot find name "module"' fix
+declare let module: any;
+
+// activate hot module reload
+if (module.hot) {
+
+    // bootstrap must not be called after DOMContentLoaded,
+    // otherwise it cannot be rerenderd after module replacement
+    //
+    // for testing try to comment the bootstrap function,
+    // open the dev tools and you'll see the reloader is replacing the module but cannot rerender it
+    bootstrap(AppComponent, [
+        ...ENV_PROVIDERS,
+        ...HTTP_PROVIDERS,
+        ...ROUTER_PROVIDERS,
+    ])
+        .catch(err => console.error(err));
+}
 
 // For vendors for example jQuery, Lodash, angular2-jwt just import them anywhere in your app
 // Also see custom_typings.d.ts as you also need to do `typings install x` where `x` is your module

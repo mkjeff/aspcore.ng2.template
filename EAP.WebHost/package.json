@@ -21,7 +21,7 @@
     "prebuild:prod": "npm run clean:dist",
     "build:prod": "webpack --config webpack.prod.config.js --progress --profile --colors --display-error-details --display-cached",
     "server": "npm run server:dev",
-    "server:dev": "webpack-dev-server --progress --profile --colors --display-error-details --display-cached  --content-base src/",
+    "server:dev": "webpack-dev-server --hot --inline --progress --profile --colors --watch --display-error-details --display-cached  --content-base src/",
     "server:prod": "http-server dist --cors",
     "webdriver:update": "webdriver-manager update",
     "webdriver:start": "webdriver-manager start",
@@ -40,10 +40,10 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.6",
+    "angular2": "2.0.0-beta.7",
     "animate.css": "^3.5.1",
     "bootstrap-sass": "^3.3.6",
-    "es6-promise": "^3.0.2",
+    "es6-promise": "^3.1.2",
     "es6-shim": "^0.33.3",
     "es7-reflect-metadata": "^1.5.5",
     "font-awesome": "^4.5.0",
@@ -51,9 +51,9 @@
     "jquery-ui": "^1.10.5",
     "perfect-scrollbar": "^0.6.10",
     "reflect-metadata": "0.1.2",
-    "rxjs": "5.0.0-beta.0",
+    "rxjs": "5.0.0-beta.2",
     "toastr": "^2.1.2",
-    "zone.js": "0.5.14"
+    "zone.js": "0.5.15"
   },
   "devDependencies": {
     "assets-webpack-plugin": "^3.3.0",

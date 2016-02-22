@@ -38,9 +38,9 @@ module.exports = {
     // Config for our build files
     output: {
         path: root('wwwroot'),
-        filename: '[name].bundle.[hash].js',
-        sourceMapFilename: '[name].[hash].map',
-        chunkFilename: '[id].chunk.[hash].js'
+        filename: '[name].bundle.js',
+        sourceMapFilename: '[name].map',
+        chunkFilename: '[id].chunk.js'
     },
 
     resolve: {
@@ -58,7 +58,6 @@ module.exports = {
           { test: /\.js$/, loader: "source-map-loader", exclude: [root('node_modules/rxjs')] }
         ],
         loaders: [
-      //{ test: require.resolve("jquery"), loader: "imports?jQuery=jquery" },
       // Bootstrap 3
       { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
 
@@ -116,7 +115,7 @@ module.exports = {
               'NODE_ENV': JSON.stringify(metadata.ENV)
           }
       }),
-          new ExtractTextPlugin("styles.[hash].css"),
+          new ExtractTextPlugin("styles.css"),
       new AssetsPlugin({ prettyPrint: true }),
       new webpack.ProvidePlugin({
           $: "jquery",

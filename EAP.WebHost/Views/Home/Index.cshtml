@@ -9,10 +9,5 @@
 </cache>
 
 @section scripts {
-    <script>
-        System.config({
-            packages: {'app': { format:'cjs', defaultExtension: 'js'}}
-        });
-        System.import('app/home/main').catch(console.log.bind(console));
-    </script>
+    <script src="~/main.bundle.js" asp-append-version="true"></script>
 }

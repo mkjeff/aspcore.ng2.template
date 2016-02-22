@@ -13,6 +13,9 @@ using OpenIddict.Models;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict;
 using NWebsec.Middleware;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace EAP.WebHost
 {
@@ -43,15 +46,22 @@ namespace EAP.WebHost
         public void ConfigureServices(IServiceCollection services)
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("config.json")
                 .AddEnvironmentVariables()
                 .Build();
 
             services.AddMvc();
 
-            //services.AddSwaggerGen();
+            services.AddEntityFramework()
+                .AddSqlServer()
+                .AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(configuration["Data:DefaultConnection:ConnectionString"]));
 
-            // Add application services.
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
+                .AddOpenIddict();
+
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
         }
@@ -63,19 +73,19 @@ namespace EAP.WebHost
             factory.AddConsole();
             factory.AddDebug();
 
-            if (env.IsDevelopment())
+            app.UseIISPlatformHandler();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
-                //app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-                //app.UseDatabaseErrorPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
+                ForwardedHeaders = ForwardedHeaders.All
+            });
+
+            app.UseDeveloperExceptionPage();
 
             app.UseStaticFiles();
 
+            // Add a middleware used to validate access
+            // tokens and protect the API endpoints.
             app.UseOAuthValidation();
             // Alternatively, you can also use the introspection middleware.
             // Using it is recommended if your resource server is in a
@@ -115,17 +125,7 @@ namespace EAP.WebHost
 
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                    name: "HomeSPA",
-                    template: "home/{*any}",
-                    defaults: new { controller = "Home", action = "Index" });
-            });
+            app.UseMvcWithDefaultRoute();
 
             //app.UseSwaggerGen();
             //app.UseSwaggerUi();

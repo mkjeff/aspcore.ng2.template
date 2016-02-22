@@ -33,7 +33,7 @@
 
 
   "commands": {
-    "web": "Mvc.Server"
+    "web": "EAP.WebHost"
   },
 
   "exclude": [
