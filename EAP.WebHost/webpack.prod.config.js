@@ -18,6 +18,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var WebpackMd5Hash = require('webpack-md5-hash');
 var AssetsPlugin = require('assets-webpack-plugin');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 var HOST = process.env.HOST || 'localhost';
 var PORT = process.env.PORT || 8080;
@@ -40,16 +41,17 @@ module.exports = {
     debug: false,
 
     entry: {
-        'polyfills': './src/polyfills.ts',
-        'main': './src/main.ts' // our angular app
+        'polyfills': './web.src/polyfills.ts',
+        'main': './web.src/main.ts' // our angular app
     },
 
     // Config for our build files
     output: {
-        path: root('wwwroot'),
-        filename: '[name].[chunkhash].bundle.js',
-        sourceMapFilename: '[name].[chunkhash].bundle.map',
-        chunkFilename: '[id].[chunkhash].chunk.js'
+        path: root('wwwroot/assets'),
+        filename: 'js/[name].bundle.js',
+        sourceMapFilename: 'map/[name].bundle.map',
+        chunkFilename: 'js/[id].chunk.js',
+        publicPath: '/assets/',
     },
 
     resolve: {
@@ -79,17 +81,10 @@ module.exports = {
           }
         ],
         loaders: [
-          // Bootstrap 3
-          {
-              test: /bootstrap-sass\/assets\/javascripts\//,
-              loader: 'imports?jQuery=jquery'
-          },
+           // Bootstrap 3
+          { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
           // Support Angular 2 async routes via .async.ts
-          {
-              test: /\.async\.ts$/,
-              loaders: ['es6-promise-loader', 'ts-loader'],
-              exclude: [/\.(spec|e2e)\.ts$/]
-          },
+          { test: /\.async\.ts$/, loaders: ['es6-promise-loader', 'ts-loader'], exclude: [/\.(spec|e2e)\.ts$/] },
           // Support for .ts files.
           {
               test: /\.ts$/,
@@ -111,8 +106,29 @@ module.exports = {
           { test: /\.css$/, loader: 'raw-loader' },
 
           // support for .html as raw text
-          { test: /\.html$/, loader: 'raw-loader', exclude: [root('src/index.html')] }
+          { test: /\.html$/, loader: 'raw-loader', exclude: [root('src/index.html')] },
 
+          // support for fonts
+          {
+              test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+              loader: "url?limit=10000&minetype=application/font-woff&name=font/[name].[ext]"
+          },
+          {
+              test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+              loader: "url?limit=10000&minetype=application/font-woff&name=font/[name].[ext]"
+          },
+          {
+              test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+              loader: "url?limit=10000&minetype=application/octet-stream&name=font/[name].[ext]"
+          },
+          {
+              test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+              loader: "file?name=font/[name].[ext]"
+          },
+          {
+              test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+              loader: "url?limit=10000&minetype=image/svg+xml&name=img/[name].[ext]"
+          }
           // if you add a loader include the file extension
         ]
     },
@@ -123,16 +139,12 @@ module.exports = {
       new OccurenceOrderPlugin(true),
       new CommonsChunkPlugin({
           name: 'polyfills',
-          filename: 'polyfills.[chunkhash].bundle.js',
+          filename: 'js/polyfills.bundle.js',
           chunks: Infinity
       }),
       // static assets
-      new CopyWebpackPlugin([
-        {
-            from: 'src/assets',
-            to: 'assets'
-        }
-      ]),
+      new CopyWebpackPlugin([{ from: 'web.src/assets', to: '.' }]),
+      new ExtractTextPlugin("css/styles.css"),
       new DefinePlugin({
           // Environment helpers
           'process.env': {
@@ -147,7 +159,9 @@ module.exports = {
           '__awaiter': 'ts-helper/awaiter',
           '__extends': 'ts-helper/extends',
           '__param': 'ts-helper/param',
-          'Reflect': 'es7-reflect-metadata/src/global/browser'
+          'Reflect': 'es7-reflect-metadata/src/global/browser',
+          $: "jquery",
+          jQuery: "jquery"
       }),
       new UglifyJsPlugin({
           // to debug prod builds uncomment //debug lines and comment //prod lines

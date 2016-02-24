@@ -37,10 +37,11 @@ module.exports = {
 
     // Config for our build files
     output: {
-        path: root('wwwroot'),
-        filename: '[name].bundle.js',
-        sourceMapFilename: '[name].map',
-        chunkFilename: '[id].chunk.js'
+        path: root('wwwroot/assets'),
+        filename: 'js/[name].bundle.js',
+        sourceMapFilename: 'map/[name].map',
+        chunkFilename: 'js/[id].chunk.js',
+        publicPath: '/assets/',
     },
 
     resolve: {
@@ -82,32 +83,32 @@ module.exports = {
       // support for fonts
       {
           test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-          loader: "url?limit=10000&minetype=application/font-woff"
+          loader: "url?limit=10000&minetype=application/font-woff&name=font/[name].[ext]"
       },
       {
           test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-          loader: "url?limit=10000&minetype=application/font-woff"
+          loader: "url?limit=10000&minetype=application/font-woff&name=font/[name].[ext]"
       },
       {
           test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-          loader: "url?limit=10000&minetype=application/octet-stream"
+          loader: "url?limit=10000&minetype=application/octet-stream&name=font/[name].[ext]"
       },
       {
           test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-          loader: "file"
+          loader: "file?name=font/[name].[ext]"
       },
       {
           test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-          loader: "url?limit=10000&minetype=image/svg+xml"
+          loader: "url?limit=10000&minetype=image/svg+xml&name=img/[name].[ext]"
       }
         ]
     },
 
     plugins: [
       new webpack.optimize.OccurenceOrderPlugin(true),
-      new webpack.optimize.CommonsChunkPlugin({ name: 'polyfills', filename: 'polyfills.bundle.js', minChunks: Infinity }),
+      new webpack.optimize.CommonsChunkPlugin({ name: 'polyfills', filename: 'js/polyfills.bundle.js', minChunks: Infinity }),
       // static assets
-      new CopyWebpackPlugin([{ from: 'src/assets', to: 'assets' }]),
+      new CopyWebpackPlugin([{ from: 'web.src/assets', to: '.' }]),
       // replace
       new webpack.DefinePlugin({
           'process.env': {
@@ -115,7 +116,7 @@ module.exports = {
               'NODE_ENV': JSON.stringify(metadata.ENV)
           }
       }),
-          new ExtractTextPlugin("styles.css"),
+      new ExtractTextPlugin("css/styles.css"),
       new AssetsPlugin({ prettyPrint: true }),
       new webpack.ProvidePlugin({
           $: "jquery",

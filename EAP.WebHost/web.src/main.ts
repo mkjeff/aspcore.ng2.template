@@ -24,15 +24,17 @@ import {AppComponent} from './app/app';
  * Bootstrap our Angular app with a top level component `App` and inject
  * our Services and Providers into Angular's dependency injection
  */
-document.addEventListener('DOMContentLoaded', function main() {
+
+function bootstrapApp() {
     bootstrap(AppComponent, [
         ...ENV_PROVIDERS,
         ...HTTP_PROVIDERS,
         ...ROUTER_PROVIDERS,
     ])
         .catch(err => console.error(err));
+}
 
-});
+document.addEventListener('DOMContentLoaded', bootstrapApp);
 
 /*
  * Modified for using hot module reload
@@ -49,12 +51,7 @@ if (module.hot) {
     //
     // for testing try to comment the bootstrap function,
     // open the dev tools and you'll see the reloader is replacing the module but cannot rerender it
-    bootstrap(AppComponent, [
-        ...ENV_PROVIDERS,
-        ...HTTP_PROVIDERS,
-        ...ROUTER_PROVIDERS,
-    ])
-        .catch(err => console.error(err));
+    bootstrapApp();
 }
 
 // For vendors for example jQuery, Lodash, angular2-jwt just import them anywhere in your app

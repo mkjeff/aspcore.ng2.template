@@ -13,8 +13,7 @@ if ('production' === process.env.ENV) {
 
     // RxJS
     // In production manually include the operators you use
-    require('rxjs/add/operator/map');
-    require('rxjs/add/operator/mergeMap');
+    require('rxjs');
 
 } else {
     // Development
@@ -30,8 +29,10 @@ if ('production' === process.env.ENV) {
 
     // RxJS
     // In development we are including every operator
-    require('rxjs/add/operator/map');
-    require('rxjs/add/operator/mergeMap');
+    //require('rxjs/add/operator/map');
+    //require('rxjs/add/operator/mergeMap');
+
+    require('rxjs');
 
 }
 // For vendors for example jQuery, Lodash, angular2-jwt just import them anywhere in your app
