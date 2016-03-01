@@ -3,10 +3,13 @@
     "class-name": true,
     "curly": false,
     "eofline": true,
-    "indent": [ true, "spaces" ],
+    "indent": [
+      true,
+      "spaces"
+    ],
     "max-line-length": [
-      false,
-      140
+      true,
+      100
     ],
     "member-ordering": [
       true,
@@ -20,7 +23,7 @@
     "no-duplicate-variable": true,
     "no-empty": false,
     "no-eval": true,
-    "no-trailing-comma": true,
+    "trailing-comma": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": true,
     "no-unused-variable": false,
