@@ -27,37 +27,17 @@ var metadata = {
 /*
  * Config
  */
-module.exports = helpers.validate({
+module.exports = helpers.defaults({
   // static data for index.html
   metadata: metadata,
 
   devtool: 'source-map',
   cache: false,
   debug: false,
-
-  entry: {
-    'polyfills': './web.src/polyfills.ts',
-    'main': './web.src/main.ts'
-  },
-
-  // Config for our build files
   output: {
     path: helpers.root('wwwroot/assets'),
-    filename: 'js/[name].bundle.js',
-    sourceMapFilename: 'map/[name].map',
-    chunkFilename: 'js/[id].chunk.js',
     publicPath: '/assets/',
   },
-
-  resolve: {
-    cache: false,
-    alias: {
-      'jquery': __dirname + '/node_modules/jquery/dist/jquery.js',
-    },
-    // ensure loader extensions match
-    extensions: ['', '.ts', '.js']
-  },
-
   module: {
     preLoaders: [
       {
@@ -185,7 +165,7 @@ module.exports = helpers.validate({
   // Other module loader config
   tslint: {
     emitErrors: true,
-    failOnHint: true,
+    failOnHint: false,
     resourcePath: 'web.src',
   },
 
@@ -197,14 +177,4 @@ module.exports = helpers.validate({
     customAttrAssign: [/\)?\]?=/]
   },
   // don't use devServer for production
-
-  // we need this due to problems with es6-shim
-  node: {
-    global: 'window',
-    progress: false,
-    crypto: 'empty',
-    module: false,
-    clearImmediate: false,
-    setImmediate: false
-  }
 });

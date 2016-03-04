@@ -7,7 +7,7 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var AssetsPlugin = require('assets-webpack-plugin');
 
 var ENV = process.env.ENV = process.env.NODE_ENV = 'development';
-var HMR = process.argv.join('').indexOf('hot') > -1;
+var HMR = helpers.hasProcessFlag('hot');
 
 var metadata = {
   title: 'EAP Web Host by @mkjeff',
@@ -20,36 +20,13 @@ var metadata = {
 /*
  * Config
  */
-module.exports = helpers.validate({
+module.exports = helpers.defaults({
   // static data for index.html
   metadata: metadata,
-  // for faster builds use 'eval'
-  devtool: 'source-map',
-  debug: true,
-  // cache: false,
-
-  // our angular app
-  entry: {
-    'polyfills': './web.src/polyfills.ts',
-    'main': './web.src/main.ts'
-  },
-
-  // Config for our build files
   output: {
     path: helpers.root('wwwroot/assets'),
-    filename: 'js/[name].bundle.js',
-    sourceMapFilename: 'map/[name].map',
-    chunkFilename: 'js/[id].chunk.js',
     publicPath: '/assets/',
   },
-
-  resolve: {
-    alias: {
-      'jquery': __dirname + '/node_modules/jquery/dist/jquery.js',
-    },
-    extensions: ['', '.ts', '.js']
-  },
-
   module: {
     preLoaders: [
       // { test: /\.ts$/, loader: 'tslint-loader', exclude: [ helpers.root('node_modules') ] },
@@ -125,20 +102,9 @@ module.exports = helpers.validate({
     })
   ],
 
-  // Other module loader config
-  tslint: {
-    emitErrors: false,
-    failOnHint: false,
-    resourcePath: 'web.src'
-  },
   // our Webpack Development Server config
   devServer: {
     port: metadata.port,
     host: metadata.host,
-    // contentBase: 'src/',
-    historyApiFallback: true,
-    watchOptions: { aggregateTimeout: 300, poll: 1000 }
   },
-  // we need this due to problems with es6-shim
-  node: { global: 'window', progress: false, crypto: 'empty', module: false, clearImmediate: false, setImmediate: false }
 });
