@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenIddict.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using OpenIddict;
 
 namespace EAP.WebHost.Models
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : OpenIddictContext<ApplicationUser>
     {
-        public DbSet<Application> Applications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

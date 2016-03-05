@@ -9,9 +9,8 @@ namespace EAP.WebHost.Controllers
             return View();
         }
 
-        public IActionResult Error()
-        {
-            return View();
+        public IActionResult Error() {
+            return View("~/Views/Shared/Error.cshtml");
         }
     }
 }

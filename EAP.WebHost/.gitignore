@@ -1,4 +1,5 @@
 ﻿wwwroot/assets/
+wwwroot/assets/**
 typings/
 
 webpack-assets.json

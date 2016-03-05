@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CryptoHelper;
+using EAP.WebHost.Models;
+using EAP.WebHost.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using EAP.WebHost.Models;
-using EAP.WebHost.Services;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder;
-using OpenIddict.Models;
-using Microsoft.AspNetCore.Identity;
-using OpenIddict;
 using NWebsec.Middleware;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.HttpOverrides;
+using OpenIddict;
+using OpenIddict.Models;
+using System;
+using System.Linq;
 
 namespace EAP.WebHost
 {
@@ -23,22 +22,15 @@ namespace EAP.WebHost
     {
         public static void Main(string[] args)
         {
-            try
-            {
-                var application = new WebHostBuilder()
-                   .UseCaptureStartupErrors(captureStartupError: true)
-                   .UseDefaultConfiguration(args)
-                   .UseIISPlatformHandlerUrl()
-                   .UseServer("Microsoft.AspNetCore.Server.Kestrel")
-                   .UseStartup<Startup>()
-                   .Build();
+            var application = new WebHostBuilder()
+               .UseCaptureStartupErrors(captureStartupError: true)
+               .UseDefaultConfiguration(args)
+               .UseIISPlatformHandlerUrl()
+               .UseServer("Microsoft.AspNetCore.Server.Kestrel")
+               .UseStartup<Startup>()
+               .Build();
 
-                application.Run();
-            }
-            catch (Exception ex)
-            {
-
-            }
+            application.Run();
         }
 
 
@@ -51,6 +43,7 @@ namespace EAP.WebHost
                 .Build();
 
             services.AddMvc();
+            services.AddMvcDnx();
 
             services.AddEntityFramework()
                 .AddSqlServer()
@@ -67,7 +60,7 @@ namespace EAP.WebHost
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             var factory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
             factory.AddConsole();
@@ -153,10 +146,26 @@ namespace EAP.WebHost
                         DisplayName = "My client application",
                         RedirectUri = "http://localhost:53507/signin-oidc",
                         LogoutRedirectUri = "http://localhost:53507/",
-                        Secret = hasher.HashPassword(null, "secret_secret_secret"),
+                        Secret = Crypto.HashPassword("secret_secret_secret"),
                         Type = OpenIddictConstants.ApplicationTypes.Confidential
                     });
 
+                    // To test this sample with Postman, use the following settings:
+                    // 
+                    // * Authorization URL: http://localhost:54540/connect/authorize
+                    // * Access token URL: http://localhost:54540/connect/token
+                    // * Client ID: postman
+                    // * Client secret: [blank] (not used with public clients)
+                    // * Scope: openid email profile roles
+                    // * Grant type: authorization code
+                    // * Request access token locally: yes
+                    context.Applications.Add(new Application
+                    {
+                        Id = "postman",
+                        DisplayName = "Postman",
+                        RedirectUri = "https://www.getpostman.com/oauth2/callback",
+                        Type = OpenIddictConstants.ApplicationTypes.Public
+                    });
                     context.SaveChanges();
                 }
             }
