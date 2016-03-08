@@ -1,5 +1,6 @@
 ﻿import {ROUTER_DIRECTIVES, RouteConfig} from 'angular2/router';
 import {Component} from 'angular2/core';
+import {HomeComponent} from './Index';
 @Component({
   selector: 'app',
   template: require('./App.html'),
@@ -10,7 +11,7 @@ import {Component} from 'angular2/core';
   {
     path: '/',
     name: 'Home',
-    loader: () => require('es6-promise!./Index')('HomeComponent'),
+    component: HomeComponent,
     useAsDefault: true
   },
   {

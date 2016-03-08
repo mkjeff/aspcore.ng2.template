@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mvc.Server.Controllers
+namespace EAP.WebHost.Controllers
 {
     [Authorize]
     public class ManageController : Controller {

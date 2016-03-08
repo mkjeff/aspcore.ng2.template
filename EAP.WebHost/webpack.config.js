@@ -20,10 +20,26 @@ var metadata = {
 /*
  * Config
  */
-module.exports = helpers.defaults({
+module.exports = {
   // static data for index.html
   metadata: metadata,
+  devtool: 'source-map',
+  stats: { colors: true, reasons: true },
+  resolve: {
+    alias: {
+      'jquery': __dirname + '/node_modules/jquery/dist/jquery.js',
+    },
+    extensions: ['', '.ts', '.js']
+  },
+  debug: true,
+  entry: {
+    'polyfills': './web.src/polyfills.ts',
+    'main': './web.src/main.ts'
+  },
   output: {
+    filename: 'js/[name].bundle.js',
+    sourceMapFilename: 'map/[name].map',
+    chunkFilename: 'js/[id].chunk.js',
     path: helpers.root('wwwroot/assets'),
     publicPath: '/assets/',
   },
@@ -38,10 +54,10 @@ module.exports = helpers.defaults({
       { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
 
       // Support for .ts files.
-      { test: /\.ts$/, loader: 'ts-loader', exclude: [/\.(spec|e2e)\.ts$/] },
+      { test: /\.ts$/, loader: 'ts-loader', exclude: [/\.(spec|e2e)\.ts$/, helpers.root('node_modules')] },
 
       // Support for *.json files.
-      { test: /\.json$/, loader: 'json-loader' },
+      { test: /\.json$/, loader: 'json-loader', exclude: [ helpers.root('node_modules') ] },
 
       // Support for CSS as raw text
       { test: /\.css$/, loader: ExtractTextPlugin.extract("style-loader", "css-loader") },
@@ -50,7 +66,7 @@ module.exports = helpers.defaults({
       { test: /\.scss$/, loader: 'style!css!sass' },
 
       // support for .html as raw text
-      { test: /\.html$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] },
+      { test: /\.html$/, loader: 'raw-loader', exclude: [ helpers.root('src/index.html'), helpers.root('node_modules') ]  },
 
 
       // support for fonts
@@ -102,9 +118,27 @@ module.exports = helpers.defaults({
     })
   ],
 
+  node: {
+    global: 'window',
+    progress: false,
+    crypto: 'empty',
+    module: false,
+    clearImmediate: false,
+    setImmediate: false
+  },
+  tslint: {
+    emitErrors: false,
+    failOnHint: false,
+    resourcePath: 'src',
+  },
   // our Webpack Development Server config
   devServer: {
     port: metadata.port,
     host: metadata.host,
+    historyApiFallback: true,
+    watchOptions: {
+      aggregateTimeout: 300,
+      poll: 1000
+    }
   },
-});
+};

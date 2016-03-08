@@ -15,7 +15,7 @@
     "./web.src/**/*.ts",
     "./web.test/**/*.ts",
     "!./node_modules/**/*.ts",
-    "web.src/custom_typings.d.ts",
+    "web.src/custom-typings.d.ts",
     "typings/browser.d.ts"
   ],
   "compileOnSave": false,

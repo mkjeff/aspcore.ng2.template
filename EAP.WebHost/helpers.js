@@ -1,15 +1,7 @@
 var path = require('path');
 var zlib = require('zlib');
-var webpackMerge = require('webpack-merge');
-var webpackDefaults = require('./webpack.default.config.js');
-
 
 // Helper functions
-
-function defaults(config) {
-  return webpackMerge(webpackDefaults, config);
-}
-
 function hasProcessFlag(flag) {
   return process.argv.join('').indexOf(flag) > -1;
 }
@@ -38,7 +30,6 @@ function prependExt(extensions, args) {
   }, ['']);
 }
 
-exports.defaults = defaults;
 exports.hasProcessFlag = hasProcessFlag;
 exports.gzipMaxLevel = gzipMaxLevel;
 exports.root = root;

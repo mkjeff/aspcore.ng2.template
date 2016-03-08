@@ -11,8 +11,14 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li *ngFor="#route of appRoutes">
-                    <a [routerLink]="route.path">{{route.name}}</a>
+                <li>
+                    <a [routerLink]="['Home']">Home</a>
+                </li> 
+                <li>
+                    <a [routerLink]="['Contact']">Contact</a>
+                </li> 
+                <li>
+                    <a [routerLink]="['About']">About</a>
                 </li> 
             </ul>
             <!-- ToDo:  @await Html.PartialAsync("_LoginPartial")-->

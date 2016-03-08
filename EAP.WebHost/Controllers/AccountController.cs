@@ -10,7 +10,7 @@ using EAP.WebHost.Models;
 using EAP.WebHost.ViewModels.Account;
 using EAP.WebHost.Services;
 
-namespace Mvc.Server.Controllers {
+namespace EAP.WebHost.Controllers {
     [Authorize]
     public class AccountController : Controller {
         private readonly UserManager<ApplicationUser> _userManager;
