@@ -1,7 +1,9 @@
 var path = require('path');
 var zlib = require('zlib');
 
+
 // Helper functions
+
 function hasProcessFlag(flag) {
   return process.argv.join('').indexOf(flag) > -1;
 }

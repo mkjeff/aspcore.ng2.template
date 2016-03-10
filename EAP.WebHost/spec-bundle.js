@@ -42,7 +42,7 @@ var testContext = require.context('./src', true, /\.spec\.ts/);
 // that will require the file and load it up here. Context will
 // loop and require those spec files here
 function requireAll(requireContext) {
-    return requireContext.keys().map(requireContext);
+  return requireContext.keys().map(requireContext);
 }
 
 var modules = requireAll(testContext);

@@ -13,6 +13,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var WebpackMd5Hash = require('webpack-md5-hash');
 var AssetsPlugin = require('assets-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+
 var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 var HOST = process.env.HOST || 'localhost';
 var PORT = process.env.PORT || 8080;
@@ -73,12 +75,11 @@ module.exports = {
       // Support for .ts files.
       {
         test: /\.ts$/,
-        loader: 'ts-loader',
+        loader: 'awesome-typescript-loader',
         query: {
           // remove TypeScript helpers to be injected below by DefinePlugin
           'compilerOptions': {
-            'removeComments': true,
-            'noEmitHelpers': true,
+            'removeComments': true
           }
         },
         exclude: [
@@ -105,7 +106,9 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'raw-loader',
-        exclude: [helpers.root('src/index.html')]
+        exclude: [
+          helpers.root('src/index.html')
+        ]
       },
 
       // support for fonts
@@ -129,15 +132,17 @@ module.exports = {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: "url?limit=10000&minetype=image/svg+xml&name=img/[name].[ext]"
       }
-      // if you add a loader include the file extension
+
     ],
     noParse: [
       helpers.root('zone.js', 'dist'),
       helpers.root('angular2', 'bundles')
     ]
+
   },
 
   plugins: [
+    new ForkCheckerPlugin(),
     new WebpackMd5Hash(),
     new DedupePlugin(),
     new OccurenceOrderPlugin(true),
@@ -147,7 +152,12 @@ module.exports = {
       chunks: Infinity
     }),
     // static assets
-    new CopyWebpackPlugin([{ from: 'web.src/assets', to: '.' }]),
+    new CopyWebpackPlugin([
+      {
+        from: 'web.src/assets',
+        to: '.'
+      }
+    ]),
     new ExtractTextPlugin("css/styles.css"),
     new DefinePlugin({
       // Environment helpers
@@ -178,15 +188,42 @@ module.exports = {
       // mangle: { screw_ie8 : true },//prod
       mangle: {
         screw_ie8: true,
-        except: ['RouterLink', 'NgFor', 'NgModel'] // needed for uglify RouterLink problem
-      },
+        except: [
+          'RouterActive',
+          'RouterLink',
+          'RouterOutlet',
+          'NgFor',
+          'NgIf',
+          'NgClass',
+          'NgSwitch',
+          'NgStyle',
+          'NgSwitchDefault',
+          'NgModel',
+          'NgControl',
+          'NgFormControl',
+          'NgForm',
+          'AsyncPipe',
+          'DatePipe',
+          'JsonPipe',
+          'NumberPipe',
+          'DecimalPipe',
+          'PercentPipe',
+          'CurrencyPipe',
+          'LowerCasePipe',
+          'UpperCasePipe',
+          'SlicePipe',
+          'ReplacePipe',
+          'I18nPluralPipe',
+          'I18nSelectPipe'
+        ] // needed for uglify RouterLink problem
+      },// prod
       compress: { screw_ie8: true },//prod
       comments: false//prod
 
     }),
     // include uglify in production
     //new CompressionPlugin({
-    //    algorithm: gzipMaxLevel,
+    //    algorithm: helpers.gzipMaxLevel,
     //    regExp: /\.css$|\.html$|\.js$|\.map$/,
     //    threshold: 2 * 1024
     //})

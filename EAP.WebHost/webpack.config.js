@@ -5,6 +5,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var AssetsPlugin = require('assets-webpack-plugin');
+var ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 
 var ENV = process.env.ENV = process.env.NODE_ENV = 'development';
 var HMR = helpers.hasProcessFlag('hot');
@@ -24,24 +25,23 @@ module.exports = {
   // static data for index.html
   metadata: metadata,
   devtool: 'source-map',
-  stats: { colors: true, reasons: true },
+  debug: true,
   resolve: {
     alias: {
       'jquery': __dirname + '/node_modules/jquery/dist/jquery.js',
     },
     extensions: ['', '.ts', '.js']
   },
-  debug: true,
   entry: {
     'polyfills': './web.src/polyfills.ts',
     'main': './web.src/main.ts'
   },
   output: {
+    publicPath: '/assets/',
+    path: helpers.root('wwwroot/assets'),
     filename: 'js/[name].bundle.js',
     sourceMapFilename: 'map/[name].map',
     chunkFilename: 'js/[id].chunk.js',
-    path: helpers.root('wwwroot/assets'),
-    publicPath: '/assets/',
   },
   module: {
     preLoaders: [
@@ -54,7 +54,7 @@ module.exports = {
       { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
 
       // Support for .ts files.
-      { test: /\.ts$/, loader: 'ts-loader', exclude: [/\.(spec|e2e)\.ts$/, helpers.root('node_modules')] },
+      { test: /\.ts$/, loader: 'awesome-typescript-loader', exclude: [/\.(spec|e2e)\.ts$/, helpers.root('node_modules')] },
 
       // Support for *.json files.
       { test: /\.json$/, loader: 'json-loader', exclude: [ helpers.root('node_modules') ] },
@@ -94,6 +94,7 @@ module.exports = {
   },
 
   plugins: [
+    new ForkCheckerPlugin(),
     new webpack.optimize.OccurenceOrderPlugin(true),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'polyfills',
@@ -118,20 +119,14 @@ module.exports = {
     })
   ],
 
-  node: {
-    global: 'window',
-    progress: false,
-    crypto: 'empty',
-    module: false,
-    clearImmediate: false,
-    setImmediate: false
-  },
+  // Other module loader config
+
+  // our Webpack Development Server config
   tslint: {
     emitErrors: false,
     failOnHint: false,
     resourcePath: 'src',
   },
-  // our Webpack Development Server config
   devServer: {
     port: metadata.port,
     host: metadata.host,
@@ -140,5 +135,13 @@ module.exports = {
       aggregateTimeout: 300,
       poll: 1000
     }
+  },
+  node: {
+    global: 'window',
+    progress: false,
+    crypto: 'empty',
+    module: false,
+    clearImmediate: false,
+    setImmediate: false
   },
 };

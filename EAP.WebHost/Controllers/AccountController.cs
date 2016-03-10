@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using EAP.WebHost.Controllers;
 using EAP.WebHost.Models;
 using EAP.WebHost.ViewModels.Account;
 using EAP.WebHost.Services;
 
-namespace EAP.WebHost.Controllers {
+namespace EAP.WebHost.Controllers
+{
     [Authorize]
     public class AccountController : Controller {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -157,7 +157,7 @@ namespace EAP.WebHost.Controllers {
                 // If the user does not have an account, then ask the user to create an account.
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
             }
         }
